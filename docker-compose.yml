@@ -33,7 +33,9 @@ services:
   migration:
     container_name: migration
     image: ${GHCR_REGISTRY:-ghcr.io}/${GHCR_USERNAME:-username}/${GHCR_REPO:-monorepo-starter}-api:${GHCR_TAG:-latest}
-    command: npx prisma migrate deploy --schema=/app/packages/db/prisma/schema.prisma
+    # Use Prisma from lockfile (6.x). Plain `npx prisma` downloads latest (7.x) and breaks schema validation.
+    working_dir: /app/packages/db
+    command: ["pnpm", "exec", "prisma", "migrate", "deploy"]
     environment:
       - DATABASE_URL=postgresql://postgres:postgres@db:5432/monorepo
     volumes:

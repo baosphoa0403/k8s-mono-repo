@@ -25,14 +25,8 @@ spec:
         - name: migration
           image: ${REGISTRY_URL}/api:latest # Use the same image as the API
           imagePullPolicy: Always
-          command:
-            [
-              "npx",
-              "prisma",
-              "migrate",
-              "deploy",
-              "--schema=/app/packages/db/prisma/schema.prisma",
-            ]
+          workingDir: /app/packages/db
+          command: ["pnpm", "exec", "prisma", "migrate", "deploy"]
           env:
             - name: DATABASE_URL
               valueFrom:

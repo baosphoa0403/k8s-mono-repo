@@ -6,7 +6,7 @@ export default function RootLayout({
 	return (
 		<html lang="en">
 			<head>
-				<title>Monorepo Starter</title>
+				<title>CRUD — Monorepo</title>
 				<link rel="stylesheet" href="https://unpkg.com/mvp.css" />
 			</head>
 			<body>{children}</body>
