@@ -1,0 +1,67 @@
+version: "3"
+
+services:
+  web:
+    container_name: web
+    # Use the image from GHCR if available, otherwise build locally
+    image: ${GHCR_REGISTRY:-ghcr.io}/${GHCR_USERNAME:-username}/${GHCR_REPO:-monorepo-starter}-web:${GHCR_TAG:-latest}
+    build:
+      context: .
+      dockerfile: ./apps/web/Dockerfile
+    restart: always
+    ports:
+      - 3000:3000
+    networks:
+      - app_network
+  api:
+    container_name: api
+    # Use the image from GHCR if available, otherwise build locally
+    image: ${GHCR_REGISTRY:-ghcr.io}/${GHCR_USERNAME:-username}/${GHCR_REPO:-monorepo-starter}-api:${GHCR_TAG:-latest}
+    build:
+      context: .
+      dockerfile: ./apps/api/Dockerfile
+    restart: always
+    ports:
+      - 3001:3001
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/monorepo
+    depends_on:
+      - db
+      - migration
+    networks:
+      - app_network
+  migration:
+    container_name: migration
+    image: ${GHCR_REGISTRY:-ghcr.io}/${GHCR_USERNAME:-username}/${GHCR_REPO:-monorepo-starter}-api:${GHCR_TAG:-latest}
+    command: npx prisma migrate deploy --schema=/app/packages/db/prisma/schema.prisma
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/monorepo
+    volumes:
+      - ./packages/db/prisma:/app/packages/db/prisma
+    depends_on:
+      - db
+    networks:
+      - app_network
+  db:
+    container_name: db
+    image: postgres:17-alpine
+    restart: always
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=monorepo
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - app_network
+
+volumes:
+  postgres_data:
+
+# Define a network, which allows containers to communicate
+# with each other, by using their container name as a hostname
+networks:
+  app_network:
+    driver: bridge

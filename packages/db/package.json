@@ -1,0 +1,29 @@
+{
+	"dependencies": {
+		"@prisma/client": "6.19.2"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "1.9.4",
+		"@types/node": "22.19.15",
+		"prisma": "6.19.2",
+		"tsup": "8.5.1",
+		"typescript": "5.9.3"
+	},
+	"main": "./dist/index.js",
+	"module": "./dist/index.mjs",
+	"name": "@repo/db",
+	"private": true,
+	"scripts": {
+		"build": "tsup src/index.ts --format cjs,esm --dts",
+		"clean": "rm -rf dist",
+		"db:generate": "prisma generate",
+		"db:migrate": "prisma migrate dev",
+		"db:push": "prisma db push --skip-generate",
+		"dev": "tsup src/index.ts --format cjs,esm --dts --watch",
+		"format": "biome format . --write",
+		"lint": "biome check .",
+		"typecheck": "tsc --noEmit"
+	},
+	"types": "./dist/index.d.ts",
+	"version": "0.0.0"
+}
